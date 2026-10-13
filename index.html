@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPO Retail Investor Toolbox</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: {
+                            bg: '#090D16',
+                            card: '#111827',
+                            border: '#1F2937',
+                            accent: '#38BDF8'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #090D16;
+            color: #F3F4F6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        /* 3D Flip Card Mechanics */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-card:hover .flip-card-inner, .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: #1F2937;
+            border-radius: 8px;
+            height: 8px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: #38BDF8;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+            transition: transform 0.2s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Glow effects */
+        .neon-glow {
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.15);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20 antialiased selection:bg-sky-500 selection:text-white">
+
+    <header class="sticky top-0 z-50 bg-[#090D16]/90 backdrop-blur-md border-b border-slate-800 px-4 py-3.5">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-sky-400 via-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-lg shadow-sky-500/25 font-extrabold">
+                    🚀
+                </div>
+                <div>
+                    <h1 class="text-lg font-extrabold text-white flex items-center gap-2">
+                        IPO Retail Investor Toolbox
+                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/30">v2.5 Advanced</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Institutional-grade primary market intelligence simplified for retail bidders</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+                <a href="#simulator" class="px-3.5 py-2 bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 text-xs font-semibold rounded-xl border border-sky-500/30 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie"></i> Exit Simulator
+                </a>
+                <a href="#scorecard" class="px-3.5 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-semibold rounded-xl border border-emerald-500/30 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-square-check"></i> Health Scorecard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 pt-8 space-y-12">
+
+        <section class="space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-bold text-sky-400 uppercase tracking-widest">Primary Market Pulse</span>
+                    <h2 class="text-2xl font-extrabold text-white mt-0.5">Verified Regulatory & Settlement Metrics</h2>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> SEBI Norms Live
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Metric 1 -->
+                <div class="glass-panel rounded-2xl p-5 border border-slate-800 hover:border-sky-500/40 transition-all group">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-lg font-bold group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded bg-sky-500/10 text-sky-400 border border-sky-500/20">Velocity</span>
+                    </div>
+                    <div class="text-2xl font-black text-white tracking-tight">T+3 Days</div>
+                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">Mandatory turnaround from issue close to exchange listing.</p>
+                </div>
+
+                <!-- Metric 2 -->
+                <div class="glass-panel rounded-2xl p-5 border border-slate-800 hover:border-emerald-500/40 transition-all group">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg font-bold group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Retail Cap</span>
+                    </div>
+                    <div class="text-2xl font-black text-emerald-400 tracking-tight">₹2,00,000</div>
+                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">Maximum bid limit per PAN via UPI auto-mandate blocking.</p>
+                </div>
+
+                <!-- Metric 3 -->
+                <div class="glass-panel rounded-2xl p-5 border border-slate-800 hover:border-purple-500/40 transition-all group">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-lg font-bold group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">HNI Bracket</span>
+                    </div>
+                    <div class="text-2xl font-black text-purple-300 tracking-tight">₹10 Lakh+</div>
+                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">High Net-Worth Individual floor with separate allotment queues.</p>
+                </div>
+
+                <!-- Metric 4 -->
+                <div class="glass-panel rounded-2xl p-5 border border-slate-800 hover:border-amber-500/40 transition-all group">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-lg font-bold group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">Anchor Lock</span>
+                    </div>
+                    <div class="text-xl font-black text-amber-400 tracking-tight">50%@30d / 50%@90d</div>
+                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">Two-tiered supply unlock window to monitor post-listing dips.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div>
+                <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Infographic Section 1</span>
+                <h2 class="text-2xl font-extrabold text-white mt-0.5">Visual Quota Allocation & Allotment Engine</h2>
+                <p class="text-xs text-slate-400 mt-1">How shares are distributed across institutional and retail investor buckets.</p>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-6 sm:p-8 space-y-6">
+                <!-- Segmented Bar -->
+                <div class="space-y-2">
+                    <div class="flex justify-between text-xs font-bold">
+                        <span class="text-sky-400">QIB Institutional (50%)</span>
+                        <span class="text-amber-400">NII / HNI (15%)</span>
+                        <span class="text-emerald-400">Retail Bidders (35%)</span>
+                    </div>
+                    <div class="w-full h-8 bg-slate-900 rounded-2xl overflow-hidden flex p-1 border border-slate-800 shadow-inner">
+                        <div onclick="showQuotaInfo('qib')" class="bg-gradient-to-r from-sky-600 to-sky-400 h-full rounded-l-xl cursor-pointer transition-all hover:opacity-90 flex items-center justify-center text-[11px] font-bold text-white shadow" style="width: 50%;">QIB (50%)</div>
+                        <div onclick="showQuotaInfo('nii')" class="bg-gradient-to-r from-amber-600 to-amber-400 h-full cursor-pointer transition-all hover:opacity-90 flex items-center justify-center text-[11px] font-bold text-slate-950 shadow mx-0.5" style="width: 15%;">NII (15%)</div>
+                        <div onclick="showQuotaInfo('retail')" class="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full rounded-r-xl cursor-pointer transition-all hover:opacity-90 flex items-center justify-center text-[11px] font-bold text-white shadow" style="width: 35%;">Retail (35%)</div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Quota Info Card -->
+                <div id="quotaInfoBox" class="p-5 rounded-2xl bg-slate-900/90 border border-sky-500/30 flex items-start gap-4 transition-all">
+                    <div id="quotaIcon" class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-2xl shrink-0 font-bold">
+                        🏛️
+                    </div>
+                    <div class="space-y-1">
+                        <div id="quotaTitle" class="text-sm font-bold text-white">QIB (Qualified Institutional Buyers) — 50% Quota</div>
+                        <p id="quotaDesc" class="text-xs text-slate-300 leading-relaxed">
+                            Includes Mutual Funds, Foreign Institutional Investors (FIIs), and commercial banks. They bid aggressively on Day 3. Their subscription level is the ultimate institutional confidence indicator.
+                        </p>
+                        <div id="quotaRule" class="text-[11px] text-sky-400 font-semibold pt-1">
+                            💡 Tip: If QIB subscription exceeds 5x-10x, it signals high institutional conviction.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="simulator" class="space-y-4">
+            <div>
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">Infographic Section 2</span>
+                <h2 class="text-2xl font-extrabold text-white mt-0.5">Advanced 'Exit Trap' Fund Flow Simulator</h2>
+                <p class="text-xs text-slate-400 mt-1">Discover where your invested capital actually flows: corporate expansion vs promoter cash-out.</p>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <!-- Left Controls -->
+                <div class="lg:col-span-5 space-y-6 bg-slate-900/80 p-6 rounded-2xl border border-slate-800">
+                    <!-- Slider 1 -->
+                    <div class="space-y-2.5">
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-semibold text-slate-300">Application Lot Amount:</label>
+                            <span id="simLotVal" class="text-sm font-bold text-sky-400 bg-sky-500/10 px-3 py-1 rounded-lg border border-sky-500/20">₹15,000</span>
+                        </div>
+                        <input type="range" id="simLotSlider" min="14000" max="200000" step="1000" value="15000" class="w-full">
+                        <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                            <span>₹14k (1 Lot)</span>
+                            <span>₹1 Lakh</span>
+                            <span>₹2 Lakh (Max)</span>
+                        </div>
+                    </div>
+
+                    <!-- Slider 2 -->
+                    <div class="space-y-2.5">
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-semibold text-slate-300">Offer for Sale (OFS) Split:</label>
+                            <span id="simOfsVal" class="text-sm font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-lg border border-amber-500/20">70%</span>
+                        </div>
+                        <input type="range" id="simOfsSlider" min="0" max="100" step="5" value="70" class="w-full">
+                        <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+                            <span>0% (Pure Growth)</span>
+                            <span>50% Balanced</span>
+                            <span>100% (Pure Exit)</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20 text-xs text-sky-300">
+                        <i class="fa-solid fa-circle-info mr-1.5"></i> High OFS means early Venture Capitalists and Promoters are liquidating their holdings rather than investing in business growth.
+                    </div>
+                </div>
+
+                <!-- Right Visual Output -->
+                <div class="lg:col-span-7 space-y-6">
+                    <!-- Visual Progress Graphic -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-bold">
+                            <span class="text-emerald-400 flex items-center gap-1.5"><i class="fa-solid fa-building"></i> Company Treasury: <span id="simFreshPct">30%</span></span>
+                            <span class="text-amber-400 flex items-center gap-1.5"><i class="fa-solid fa-hand-holding-dollar"></i> Exiting Investors: <span id="simOfsPct">70%</span></span>
+                        </div>
+                        <div class="w-full h-6 bg-slate-900 rounded-full overflow-hidden flex p-1 border border-slate-800">
+                            <div id="simFreshBar" class="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full rounded-l-full transition-all duration-300" style="width: 30%;"></div>
+                            <div id="simOfsBar" class="bg-gradient-to-r from-amber-600 to-amber-400 h-full rounded-r-full transition-all duration-300" style="width: 70%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Split Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-emerald-950/30 p-5 rounded-2xl border border-emerald-500/30">
+                            <div class="text-xs text-emerald-400 font-semibold">Net Balance Sheet Injection</div>
+                            <div id="simFreshAmt" class="text-2xl font-black text-emerald-300 mt-1">₹4,500</div>
+                            <p class="text-[11px] text-slate-400 mt-1">Used for capital expenditure, tech scaling & debt repayment.</p>
+                        </div>
+
+                        <div class="bg-amber-950/30 p-5 rounded-2xl border border-amber-500/30">
+                            <div class="text-xs text-amber-400 font-semibold">Exiting Promoter Payout</div>
+                            <div id="simOfsAmt" class="text-2xl font-black text-amber-300 mt-1">₹10,500</div>
+                            <p class="text-[11px] text-slate-400 mt-1">Directly transferred to exiting shareholders' bank accounts.</p>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Verdict Banner -->
+                    <div id="simVerdictBox" class="p-4 rounded-2xl border transition-all flex items-start gap-3 bg-amber-500/10 border-amber-500/30 text-amber-200">
+                        <span id="simVerdictIcon" class="text-2xl">⚠️</span>
+                        <div>
+                            <div id="simVerdictTitle" class="font-bold text-sm">Caution: High Liquidity Exit (OFS > 70%)</div>
+                            <p id="simVerdictDesc" class="text-xs opacity-90 mt-0.5 leading-relaxed">
+                                The vast majority of funds raised bypass the company's business operations entirely. Evaluate profit margins and valuation very carefully before bidding.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div>
+                <span class="text-xs font-bold text-purple-400 uppercase tracking-widest">Infographic Section 3</span>
+                <h2 class="text-2xl font-extrabold text-white mt-0.5">Interactive 3D Flip Flashcards</h2>
+                <p class="text-xs text-slate-400 mt-1">Click or hover any card to flip and master essential IPO concepts instantly.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Card 1: Fresh vs OFS -->
+                <div class="flip-card perspective-1000 h-72 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front glass-panel p-6 border border-slate-800 flex flex-col justify-between hover:border-sky-500/50">
+                            <div>
+                                <span class="text-[10px] font-bold text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-lg border border-sky-500/20">Concept 01</span>
+                                <h3 class="text-lg font-bold text-white mt-3">Fresh Capital vs. OFS</h3>
+                                <p class="text-xs text-slate-400 mt-2">Where does your IPO bid money go upon successful allotment?</p>
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-sky-400 font-semibold pt-4 border-t border-slate-800/80">
+                                <span>Click to flip card</span>
+                                <i class="fa-solid fa-rotate text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="flip-card-back bg-gradient-to-br from-slate-900 to-sky-950 p-6 border border-sky-500/40 rounded-2xl flex flex-col justify-between shadow-2xl">
+                            <div class="space-y-2 text-xs">
+                                <h4 class="font-bold text-sky-300 text-sm">The Core Difference:</h4>
+                                <div class="bg-emerald-950/40 p-2 rounded-xl border border-emerald-500/30 text-emerald-300">
+                                    <strong>Fresh Issue:</strong> New shares created. Money enters the company balance sheet.
+                                </div>
+                                <div class="bg-amber-950/40 p-2 rounded-xl border border-amber-500/30 text-amber-300">
+                                    <strong>OFS:</strong> Zero new shares. Old promoters cash out their personal holdings.
+                                </div>
+                            </div>
+                            <div class="text-[10px] text-slate-400 italic">Always prefer companies with high Fresh Issue allocations.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Cut-off Price Trick -->
+                <div class="flip-card perspective-1000 h-72 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front glass-panel p-6 border border-slate-800 flex flex-col justify-between hover:border-emerald-500/50">
+                            <div>
+                                <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">Concept 02</span>
+                                <h3 class="text-lg font-bold text-white mt-3">The "Cut-off Price" Trick</h3>
+                                <p class="text-xs text-slate-400 mt-2">Why retail investors must never bid below the cap price.</p>
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-emerald-400 font-semibold pt-4 border-t border-slate-800/80">
+                                <span>Click to flip card</span>
+                                <i class="fa-solid fa-rotate text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="flip-card-back bg-gradient-to-br from-slate-900 to-emerald-950 p-6 border border-emerald-500/40 rounded-2xl flex flex-col justify-between shadow-2xl">
+                            <div class="space-y-2 text-xs">
+                                <h4 class="font-bold text-emerald-300 text-sm">Bidding Pro-Tip:</h4>
+                                <p class="text-slate-300 leading-relaxed">
+                                    If the price band is ₹500 - ₹530, checking <strong class="text-emerald-400">Cut-off</strong> ensures your bid matches the final discovered issue price (usually upper band).
+                                </p>
+                                <div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-200 text-[11px]">
+                                    💡 Bidding lower than final price leads to immediate application rejection.
+                                </div>
+                            </div>
+                            <div class="text-[10px] text-slate-400 italic">Available on all UPI broker applications.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Grey Market Premium (GMP) -->
+                <div class="flip-card perspective-1000 h-72 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front glass-panel p-6 border border-slate-800 flex flex-col justify-between hover:border-amber-500/50">
+                            <div>
+                                <span class="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">Concept 03</span>
+                                <h3 class="text-lg font-bold text-white mt-3">Grey Market Premium (GMP)</h3>
+                                <p class="text-xs text-slate-400 mt-2">Is unofficial grey market trading a reliable listing indicator?</p>
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-amber-400 font-semibold pt-4 border-t border-slate-800/80">
+                                <span>Click to flip card</span>
+                                <i class="fa-solid fa-rotate text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="flip-card-back bg-gradient-to-br from-slate-900 to-amber-950 p-6 border border-amber-500/40 rounded-2xl flex flex-col justify-between shadow-2xl">
+                            <div class="space-y-2 text-xs">
+                                <h4 class="font-bold text-amber-300 text-sm">Reality Check:</h4>
+                                <p class="text-slate-300 leading-relaxed">
+                                    GMP is completely <strong class="text-amber-400">unofficial and unregulated</strong>. While it reflects informal market sentiment, it can be manipulated by syndicates and fluctuate wildly overnight.
+                                </p>
+                                <div class="p-2 bg-amber-500/10 rounded-lg text-amber-200 text-[11px]">
+                                    ⚠️ Never base investment decisions purely on social media GMP rumors.
+                                </div>
+                            </div>
+                            <div class="text-[10px] text-slate-400 italic">Focus on underlying financials and valuation instead.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Anchor Lock-in -->
+                <div class="flip-card perspective-1000 h-72 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front glass-panel p-6 border border-slate-800 flex flex-col justify-between hover:border-purple-500/50">
+                            <div>
+                                <span class="text-[10px] font-bold text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-lg border border-purple-500/20">Concept 04</span>
+                                <h3 class="text-lg font-bold text-white mt-3">Anchor Investor Lock-in</h3>
+                                <p class="text-xs text-slate-400 mt-2">What happens when anchor investor lock-in periods expire?</p>
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-purple-400 font-semibold pt-4 border-t border-slate-800/80">
+                                <span>Click to flip card</span>
+                                <i class="fa-solid fa-rotate text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="flip-card-back bg-gradient-to-br from-slate-900 to-purple-950 p-6 border border-purple-500/40 rounded-2xl flex flex-col justify-between shadow-2xl">
+                            <div class="space-y-2 text-xs">
+                                <h4 class="font-bold text-purple-300 text-sm">Supply Unlock Windows:</h4>
+                                <p class="text-slate-300 leading-relaxed">
+                                    Anchor shares are locked in two tranches: <strong class="text-purple-300">50% for 30 days</strong> and <strong class="text-purple-300">50% for 90 days</strong> post-listing.
+                                </p>
+                                <div class="p-2 bg-purple-500/10 rounded-lg text-purple-200 text-[11px]">
+                                    📈 Watch out for potential stock price volatility around these calendar dates.
+                                </div>
+                            </div>
+                            <div class="text-[10px] text-slate-400 italic">Institutional supply release test.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5: DRHP vs RHP -->
+                <div class="flip-card perspective-1000 h-72 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front glass-panel p-6 border border-slate-800 flex flex-col justify-between hover:border-sky-500/50">
+                            <div>
+                                <span class="text-[10px] font-bold text-sky-400 bg-sky-500/10 px-2.5 py-1 rounded-lg border border-sky-500/20">Concept 05</span>
+                                <h3 class="text-lg font-bold text-white mt-3">DRHP vs. RHP Documents</h3>
+                                <p class="text-xs text-slate-400 mt-2">Understanding the paperwork filed with SEBI and exchanges.</p>
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-sky-400 font-semibold pt-4 border-t border-slate-800/80">
+                                <span>Click to flip card</span>
+                                <i class="fa-solid fa-rotate text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="flip-card-back bg-gradient-to-br from-slate-900 to-sky-950 p-6 border border-sky-500/40 rounded-2xl flex flex-col justify-between shadow-2xl">
+                            <div class="space-y-2 text-xs">
+                                <h4 class="font-bold text-sky-300 text-sm">Document Stages:</h4>
+                                <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                                    <strong>DRHP (Draft):</strong> Submitted months in advance for SEBI review & public feedback.
+                                </div>
+                                <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                                    <strong>RHP (Red Herring):</strong> Finalized prospectus without price, published right before opening.
+                                </div>
+                            </div>
+                            <div class="text-[10px] text-slate-400 italic">Check RHP risk factors section.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6: Oversubscription Lottery -->
+                <div class="flip-card perspective-1000 h-72 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front glass-panel p-6 border border-slate-800 flex flex-col justify-between hover:border-emerald-500/50">
+                            <div>
+                                <span class="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">Concept 06</span>
+                                <h3 class="text-lg font-bold text-white mt-3">Oversubscription Lottery</h3>
+                                <p class="text-xs text-slate-400 mt-2">How allotment is decided when retail quota is heavily oversubscribed.</p>
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-emerald-400 font-semibold pt-4 border-t border-slate-800/80">
+                                <span>Click to flip card</span>
+                                <i class="fa-solid fa-rotate text-sm"></i>
+                            </div>
+                        </div>
+                        <div class="flip-card-back bg-gradient-to-br from-slate-900 to-emerald-950 p-6 border border-emerald-500/40 rounded-2xl flex flex-col justify-between shadow-2xl">
+                            <div class="space-y-2 text-xs">
+                                <h4 class="font-bold text-emerald-300 text-sm">Allotment Mechanics:</h4>
+                                <p class="text-slate-300 leading-relaxed">
+                                    If retail is 20x oversubscribed, applying for 10 lots <strong class="text-emerald-400">does not</strong> increase your probability. Every PAN gets a single lottery ticket for 1 minimum lot.
+                                </p>
+                                <div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-200 text-[11px]">
+                                    🎯 Apply via multiple family member PANs to increase overall chances!
+                                </div>
+                            </div>
+                            <div class="text-[10px] text-slate-400 italic">SEBI computerized random allocation.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div>
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">Infographic Section 4</span>
+                <h2 class="text-2xl font-extrabold text-white mt-0.5">The T+3 Settlement Flight Path</h2>
+                <p class="text-xs text-slate-400 mt-1">Interactive timeline pipeline illustrating how an IPO progresses from DRHP filing to exchange listing.</p>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-6 sm:p-8">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 relative">
+                    <!-- Step 1 -->
+                    <div onclick="selectFlightStep(1)" id="flight-btn-1" class="flight-card cursor-pointer p-5 rounded-2xl bg-sky-500/10 border border-sky-500/40 transition-all">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="w-7 h-7 rounded-xl bg-sky-500 text-slate-950 font-bold text-xs flex items-center justify-center">1</span>
+                            <span class="text-[10px] text-sky-400 font-mono font-bold">Day -30</span>
+                        </div>
+                        <div class="font-bold text-white text-sm">DRHP Filing</div>
+                        <p class="text-xs text-slate-400 mt-1">SEBI vetting & regulatory scrutiny.</p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div onclick="selectFlightStep(2)" id="flight-btn-2" class="flight-card cursor-pointer p-5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="w-7 h-7 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs flex items-center justify-center">2</span>
+                            <span class="text-[10px] text-slate-400 font-mono font-bold">Day -7</span>
+                        </div>
+                        <div class="font-bold text-white text-sm">RHP & Anchor</div>
+                        <p class="text-xs text-slate-400 mt-1">Price band & anchor book commitment.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div onclick="selectFlightStep(3)" id="flight-btn-3" class="flight-card cursor-pointer p-5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="w-7 h-7 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs flex items-center justify-center">3</span>
+                            <span class="text-[10px] text-slate-400 font-mono font-bold">Days 1-3</span>
+                        </div>
+                        <div class="font-bold text-white text-sm">Bidding Floor</div>
+                        <p class="text-xs text-slate-400 mt-1">Retail UPI ASBA mandate blocking.</p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div onclick="selectFlightStep(4)" id="flight-btn-4" class="flight-card cursor-pointer p-5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="w-7 h-7 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs flex items-center justify-center">4</span>
+                            <span class="text-[10px] text-slate-400 font-mono font-bold">T+1 to T+2</span>
+                        </div>
+                        <div class="font-bold text-white text-sm">Allotment</div>
+                        <p class="text-xs text-slate-400 mt-1">Shares credited & unblocking triggered.</p>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div onclick="selectFlightStep(5)" id="flight-btn-5" class="flight-card cursor-pointer p-5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="w-7 h-7 rounded-xl bg-slate-800 text-slate-300 font-bold text-xs flex items-center justify-center">5</span>
+                            <span class="text-[10px] text-emerald-400 font-mono font-bold">Day T+3</span>
+                        </div>
+                        <div class="font-bold text-white text-sm">Listing Bell</div>
+                        <p class="text-xs text-slate-400 mt-1">Secondary trading begins at 10 AM.</p>
+                    </div>
+                </div>
+
+                <!-- Flight Step Detail Box -->
+                <div id="flightDetailBox" class="mt-6 p-5 rounded-2xl bg-slate-900 border border-sky-500/30 text-xs text-slate-300 flex items-start gap-4">
+                    <span class="text-2xl">🚀</span>
+                    <div id="flightDetailText">
+                        <strong class="text-white text-sm">Stage 1 (DRHP Vetting):</strong> The company submits its draft Red Herring Prospectus to SEBI. Investors can review business risks, promoter backgrounds, and proposed financial utilization months before public launch.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="space-y-4">
+            <div>
+                <span class="text-xs font-bold text-sky-400 uppercase tracking-widest">Infographic Section 5</span>
+                <h2 class="text-2xl font-extrabold text-white mt-0.5">Rising Sector Radar & Valuation Heatmap</h2>
+                <p class="text-xs text-slate-400 mt-1">High-conviction primary market sectors with projected CAGR and risk-meter gauges.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Sector 1 -->
+                <div class="glass-panel rounded-2xl p-6 border border-slate-800 hover:border-sky-500/40 transition-all space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-microchip"></i>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">CAGR +24%</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Fintech & New-Age Tech</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">Transitioning from unconstrained revenue burn to positive operating cash flows & EBITDA profitability.</p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-800/80 flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Risk Meter:</span>
+                        <span class="text-amber-400 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Moderate-High</span>
+                    </div>
+                </div>
+
+                <!-- Sector 2 -->
+                <div class="glass-panel rounded-2xl p-6 border border-slate-800 hover:border-emerald-500/40 transition-all space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-solar-panel"></i>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">CAGR +31%</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Renewable Energy & EVs</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">Capital-intensive expansion funding solar/wind parks, green hydrogen, and domestic cell manufacturing.</p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-800/80 flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Risk Meter:</span>
+                        <span class="text-sky-400 font-bold"><i class="fa-solid fa-shield-halved"></i> Balanced</span>
+                    </div>
+                </div>
+
+                <!-- Sector 3 -->
+                <div class="glass-panel rounded-2xl p-6 border border-slate-800 hover:border-purple-500/40 transition-all space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-hospital"></i>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">CAGR +18%</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Healthcare & Hospitals</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">Expanding tier-2/3 regional hospital beds (ARPOB) and advanced diagnostics networks nationwide.</p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-800/80 flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Risk Meter:</span>
+                        <span class="text-emerald-400 font-bold"><i class="fa-solid fa-check-circle"></i> Low-Moderate</span>
+                    </div>
+                </div>
+
+                <!-- Sector 4 -->
+                <div class="glass-panel rounded-2xl p-6 border border-slate-800 hover:border-amber-500/40 transition-all space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">CAGR +15%</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Consumer & Retail Brands</h3>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">D2C and omnichannel retail scaling distribution rapidly to capture India's expanding consumption demographic.</p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-800/80 flex justify-between items-center text-xs">
+                        <span class="text-slate-400">Risk Meter:</span>
+                        <span class="text-sky-400 font-bold"><i class="fa-solid fa-shield-halved"></i> Balanced</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="scorecard" class="space-y-4">
+            <div>
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">Infographic Section 6</span>
+                <h2 class="text-2xl font-extrabold text-white mt-0.5">Interactive Pre-Bid Risk-Reward Health Scorecard</h2>
+                <p class="text-xs text-slate-400 mt-1">Check off these 5 institutional criteria to calculate your investment readiness score.</p>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-6 sm:p-8 border-emerald-500/30 space-y-6">
+                <!-- Score Header Bar -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-800">
+                    <div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Evaluation Score</div>
+                        <div id="scoreNumText" class="text-3xl font-black text-amber-400 mt-1">0 / 5 Criteria Met</div>
+                    </div>
+                    <div id="scoreVerdictBadge" class="px-4 py-2 rounded-2xl text-xs font-extrabold bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Needs More Research
+                    </div>
+                </div>
+
+                <!-- Checklist Items -->
+                <div class="space-y-3">
+                    <label class="flex items-start gap-4 p-4 rounded-2xl bg-slate-900/70 border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-all">
+                        <input type="checkbox" onchange="calcHealthScore()" class="chk-criteria mt-1 w-5 h-5 rounded-lg text-sky-500 focus:ring-sky-500 bg-slate-800 border-slate-700 cursor-pointer">
+                        <div class="space-y-0.5">
+                            <span class="text-sm font-bold text-white">1. Competitive P/E Valuation Check</span>
+                            <p class="text-xs text-slate-400">Ensure the issue price P/E ratio is comparable or attractive relative to established listed sector peers.</p>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-4 p-4 rounded-2xl bg-slate-900/70 border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-all">
+                        <input type="checkbox" onchange="calcHealthScore()" class="chk-criteria mt-1 w-5 h-5 rounded-lg text-sky-500 focus:ring-sky-500 bg-slate-800 border-slate-700 cursor-pointer">
+                        <div class="space-y-0.5">
+                            <span class="text-sm font-bold text-white">2. QIB Subscription > 5x on Day 3</span>
+                            <p class="text-xs text-slate-400">Confirm strong institutional backing before committing retail capital.</p>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-4 p-4 rounded-2xl bg-slate-900/70 border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-all">
+                        <input type="checkbox" onchange="calcHealthScore()" class="chk-criteria mt-1 w-5 h-5 rounded-lg text-sky-500 focus:ring-sky-500 bg-slate-800 border-slate-700 cursor-pointer">
+                        <div class="space-y-0.5">
+                            <span class="text-sm font-bold text-white">3. Fresh Issue Allocation > 50%</span>
+                            <p class="text-xs text-slate-400">Verify that the majority of raised capital enters the company treasury rather than promoter cash-out.</p>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-4 p-4 rounded-2xl bg-slate-900/70 border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-all">
+                        <input type="checkbox" onchange="calcHealthScore()" class="chk-criteria mt-1 w-5 h-5 rounded-lg text-sky-500 focus:ring-sky-500 bg-slate-800 border-slate-700 cursor-pointer">
+                        <div class="space-y-0.5">
+                            <span class="text-sm font-bold text-white">4. Cut-off Price Selected in UPI App</span>
+                            <p class="text-xs text-slate-400">Ensure bidding is set to 'Cut-off' to prevent invalid bids if the final price is fixed at upper band.</p>
+                        </div>
+                    </label>
+
+                    <label class="flex items-start gap-4 p-4 rounded-2xl bg-slate-900/70 border border-slate-800/80 hover:border-slate-700 cursor-pointer transition-all">
+                        <input type="checkbox" onchange="calcHealthScore()" class="chk-criteria mt-1 w-5 h-5 rounded-lg text-sky-500 focus:ring-sky-500 bg-slate-800 border-slate-700 cursor-pointer">
+                        <div class="space-y-0.5">
+                            <span class="text-sm font-bold text-white">5. UPI Mandate Approved Before 5 PM Deadline</span>
+                            <p class="text-xs text-slate-400">Check BHIM/GPay/PhonePe to approve the UPI mandate block before bidding closes on Day 3.</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="max-w-7xl mx-auto px-4 mt-16 text-center text-xs text-slate-500 border-t border-slate-800 pt-6 space-y-1">
+        <p class="font-semibold text-slate-400">IPO Retail Investor Toolbox • Designed for Educational & Institutional Awareness</p>
+        <p>SEBI & Exchange Norms verified: T+3 Settlement, ₹2,00,000 Retail UPI Cap, 50%@30d / 50%@90d Anchor Lock-in.</p>
+    </footer>
+
+    <script>
+        // Quota Tab Data
+        const quotaData = {
+            qib: {
+                title: "QIB (Qualified Institutional Buyers) — 50% Quota",
+                desc: "Includes Mutual Funds, Foreign Institutional Investors (FIIs), and commercial banks. They bid aggressively on Day 3. Their subscription level is the ultimate institutional confidence indicator.",
+                rule: "💡 Tip: If QIB subscription exceeds 5x-10x, it signals high institutional conviction.",
+                icon: "🏛️"
+            },
+            nii: {
+                title: "NII / HNI (Non-Institutional Investors) — 15% Quota",
+                desc: "Includes high net-worth individuals, corporates, and trusts bidding above ₹2 Lakhs. Split into sHNI (₹2L to ₹10L) and bHNI (above ₹10L with bHNI borrowing via IPO financing).",
+                rule: "💡 Tip: High NII funding interest often indicates strong gray market momentum.",
+                icon: "💼"
+            },
+            retail: {
+                title: "Retail Individual Investors (RII) — 35% Quota",
+                desc: "Individual resident investors bidding up to ₹2,00,000. Allotment is strictly randomized via computer lottery if oversubscribed (1 lot per PAN).",
+                rule: "💡 Tip: Never apply for multiple lots under the same PAN; use family member PANs instead.",
+                icon: "👤"
+            }
+        };
+
+        function showQuotaInfo(type) {
+            const data = quotaData[type];
+            document.getElementById('quotaTitle').textContent = data.title;
+            document.getElementById('quotaDesc').textContent = data.desc;
+            document.getElementById('quotaRule').textContent = data.rule;
+            document.getElementById('quotaIcon').textContent = data.icon;
+        }
+
+        // Exit Trap Simulator Logic
+        const simLotSlider = document.getElementById('simLotSlider');
+        const simOfsSlider = document.getElementById('simOfsSlider');
+
+        function updateSimulator() {
+            const amount = parseFloat(simLotSlider.value);
+            const ofsPct = parseFloat(simOfsSlider.value);
+            const freshPct = 100 - ofsPct;
+
+            const ofsAmt = Math.round(amount * (ofsPct / 100));
+            const freshAmt = Math.round(amount * (freshPct / 100));
+
+            const fmt = (n) => "₹" + n.toLocaleString('en-IN');
+
+            document.getElementById('simLotVal').textContent = fmt(amount);
+            document.getElementById('simOfsVal').textContent = ofsPct + "%";
+            document.getElementById('simFreshPct').textContent = freshPct + "%";
+            document.getElementById('simOfsPct').textContent = ofsPct + "%";
+
+            document.getElementById('simFreshAmt').textContent = fmt(freshAmt);
+            document.getElementById('simOfsAmt').textContent = fmt(ofsAmt);
+
+            document.getElementById('simFreshBar').style.width = freshPct + "%";
+            document.getElementById('simOfsBar').style.width = ofsPct + "%";
+
+            const box = document.getElementById('simVerdictBox');
+            const icon = document.getElementById('simVerdictIcon');
+            const title = document.getElementById('simVerdictTitle');
+            const desc = document.getElementById('simVerdictDesc');
+
+            if (ofsPct <= 30) {
+                box.className = "p-4 rounded-2xl border transition-all flex items-start gap-3 bg-emerald-500/10 border-emerald-500/30 text-emerald-200";
+                icon.textContent = "🚀";
+                title.textContent = "Growth-Oriented Issue (OFS < 30%)";
+                desc.textContent = "Over 70% of raised capital enters the company balance sheet to fund real business expansion, research, or debt reduction.";
+            } else if (ofsPct <= 65) {
+                box.className = "p-4 rounded-2xl border transition-all flex items-start gap-3 bg-sky-500/10 border-sky-500/30 text-sky-200";
+                icon.textContent = "⚖️";
+                title.textContent = "Balanced Capital Structure";
+                desc.textContent = "Healthy mix of fresh growth capital and partial early investor liquidation. Review the RHP object table for exact allocation details.";
+            } else {
+                box.className = "p-4 rounded-2xl border transition-all flex items-start gap-3 bg-amber-500/10 border-amber-500/30 text-amber-200";
+                icon.textContent = "⚠️";
+                title.textContent = "Caution: High Liquidity Exit (OFS > 70%)";
+                desc.textContent = "The vast majority of funds raised bypass company operations entirely and go to promoters/VCs cashing out. Evaluate valuations extremely carefully.";
+            }
+        }
+
+        simLotSlider.addEventListener('input', updateSimulator);
+        simOfsSlider.addEventListener('input', updateSimulator);
+
+        // Flight Path Timeline Data
+        const flightTips = {
+            1: "<strong class='text-white text-sm'>Stage 1 (DRHP Vetting):</strong> The company submits its draft Red Herring Prospectus to SEBI. Investors can review business risks, promoter backgrounds, and proposed financial utilization months before public launch.",
+            2: "<strong class='text-white text-sm'>Stage 2 (RHP & Anchor Book):</strong> Exact price band and dates are announced. Institutional anchor investors commit capital one day prior to public opening, giving a vital confidence signal.",
+            3: "<strong class='text-white text-sm'>Stage 3 (Bidding Floor):</strong> Bidding opens for QIB, NII, and Retail investors. Retail applicants submit bids via UPI ASBA mandates up to ₹2,00,000 limit.",
+            4: "<strong class='text-white text-sm'>Stage 4 (Allotment Day):</strong> Computerized lottery decides share allocation. Successful applicants receive shares in demat; unallocated funds are automatically unblocked.",
+            5: "<strong class='text-white text-sm'>Stage 5 (Listing Day):</strong> Trading commences at 10:00 AM on NSE and BSE following pre-open price discovery between 9:00 AM and 9:45 AM."
+        };
+
+        function selectFlightStep(step) {
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.getElementById(`flight-btn-${i}`);
+                if (i === step) {
+                    btn.className = "flight-card cursor-pointer p-5 rounded-2xl bg-sky-500/10 border border-sky-500/40 transition-all";
+                } else {
+                    btn.className = "flight-card cursor-pointer p-5 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all";
+                }
+            }
+            document.getElementById('flightDetailText').innerHTML = flightTips[step];
+        }
+
+        // Health Scorecard Logic
+        function calcHealthScore() {
+            const items = document.querySelectorAll('.chk-criteria');
+            let count = 0;
+            items.forEach(el => { if (el.checked) count++; });
+
+            const numText = document.getElementById('scoreNumText');
+            const badge = document.getElementById('scoreVerdictBadge');
+
+            numText.textContent = `${count} / 5 Criteria Met`;
+
+            if (count === 5) {
+                badge.className = "px-4 py-2 rounded-2xl text-xs font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-2";
+                badge.innerHTML = "<i class='fa-solid fa-circle-check'></i> Strong Fundamentals - Ready to Apply!";
+            } else if (count >= 3) {
+                badge.className = "px-4 py-2 rounded-2xl text-xs font-extrabold bg-sky-500/20 text-sky-300 border border-sky-500/30 flex items-center gap-2";
+                badge.innerHTML = "<i class='fa-solid fa-circle-info'></i> Moderate Readiness - Review RHP";
+            } else {
+                badge.className = "px-4 py-2 rounded-2xl text-xs font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-2";
+                badge.innerHTML = "<i class='fa-solid fa-triangle-exclamation'></i> Needs More Research";
+            }
+        }
+
+        window.onload = function() {
+            updateSimulator();
+            calcHealthScore();
+        };
+    </script>
+</body>
+</html>
